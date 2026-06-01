@@ -13,8 +13,8 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>17</javafx.version>
-        <sonar.projectKey>${env.SONAR_PROJECT_KEY}</sonar.projectKey>
-        <sonar.organization>${env.SONAR_ORGANIZATION}</sonar.organization>
+        <sonar.projectKey>Lupoldo11_CarreraDeCamellos</sonar.projectKey>
+        <sonar.organization>lupoldo11</sonar.organization>
     </properties>
 
     <dependencies>
