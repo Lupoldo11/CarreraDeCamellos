@@ -1,10 +1,6 @@
-# This is a basic workflow to help you get started with Actions
+name: ci
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: 
       - main
@@ -13,42 +9,67 @@ on:
     branches: 
       - main
       - develop
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+permissions: 
+  contents: read
+
 jobs:
-  # This workflow contains a single job called "build"
+
   build:
-    # The type of runner that the job will run on
+    name: Build Application
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    
     steps:
-      - name: Descargar código
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
+      - uses: actions/checkout@v4
       - name: Instalar Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
           cache: maven
-
-      - name: Compilar y ejecutar tests
-        run: mvn clean verify
-
+      - name: Compilar proyecto
+        run: mvn clean compile
+        
+  unit-tests:
+    name: Unit Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
       - name: Generar reporte JaCoCo
         run: mvn jacoco:report
-
-      - name: Analizar con SonarCloud
+        
+  #test_integracion:
+  
+  sonar:
+    name: SonarQube
+    needs: [ build , unit-tests ]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Coverage
+        run: mvn verify
+      - name: Sonar Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: >
           mvn sonar:sonar
-          -Dsonar.projectKey=lupoldo-carreracamello
-          -Dsonar.organization=Lupoldo_CarreraCamello
+          -Dsonar.projectKey=TU_PROJECT_KEY
+          -Dsonar.organization=TU_ORGANIZATION
           -Dsonar.host.url=https://sonarcloud.io
+          
+  #image:
